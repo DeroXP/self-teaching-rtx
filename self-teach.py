@@ -122,13 +122,6 @@ def search(query):
             # Get the Wikipedia page for the query
             page = wikipedia.page(query, auto_suggest=True)
 
-            # Handle disambiguation pages
-            if isinstance(page, wikipedia.exceptions.DisambiguationError):
-                print("The search query is ambiguous. Did you mean any of these:")
-                for option in page.options:
-                    print(option)
-                return
-
             # Get the title, summary, and URL of the Wikipedia page
             title = page.title
             summary = page.summary
@@ -159,9 +152,16 @@ def search(query):
             return
 
         except wikipedia.PageError as e:
-            print(f"Error: {e}")
+            # Print a more informative message for the user
+            print(f"Error: Wikipedia page for '{query}' not found. Please check the spelling or try a different query.")
+            suggestions = wikipedia.search(query)
+            if suggestions:
+                print("Did you mean any of these:")
+                for suggestion in suggestions:
+                    print(f"- {suggestion}")
+            return
 
-        except (wikipedia.WikipediaException, wikipedia.exceptions.DisambiguationError, wikipedia.PageError) as e:
+        except (wikipedia.WikipediaException, wikipedia.exceptions.DisambiguationError) as e:
             time.sleep(0.5)
 
     # Print the results
